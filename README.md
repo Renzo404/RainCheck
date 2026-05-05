@@ -1,10 +1,10 @@
-# RainCheck 🌧️🛵
+# RainCheck
 
 SimPy discrete-event simulation analyzing food delivery SLA degradation during rain in Baguio City. Integrates Meteoblue climate data, FHWA speed penalties, and UP NCTS behavioral shifts to model the "perfect storm" of delivery bottlenecks where supply-side attrition meets a 44% demand surge. Built for urban logistics research.
 
 ---
 
-## 📊 Overview
+## Overview
 
 In highly congested, high-altitude urban environments like the Baguio City Central Business District (CBD), adverse weather severely degrades on-demand logistics. **RainCheck** quantifies this degradation by mapping real-world empirical data into a stochastic SimPy environment.
 
@@ -15,7 +15,7 @@ The simulation tests the breaking point of standard 45-minute Service Level Agre
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
 The codebase is organized to strictly separate raw empirical data, core simulation logic, and resulting analysis.
 
@@ -36,7 +36,7 @@ The codebase is organized to strictly separate raw empirical data, core simulati
 
 ---
 
-## ⚙️ Installation & Setup
+## Installation & Setup
 
 1. **Clone the repository:**
    ```bash
@@ -57,7 +57,7 @@ The codebase is organized to strictly separate raw empirical data, core simulati
 
 ---
 
-## 🚀 Usage
+## Usage
 
 **Running the Simulation**
 Execute the main script to start a simulation run. By default, it will read the configurations set in `parameters.py` and output the timeline logs to the `data/outputs/` directory.
@@ -71,5 +71,5 @@ To adjust the simulation (e.g., testing different rider fleet capacities or alte
 
 ---
 
-## 📚 Academic Context
+## Academic Context
 This repository serves as the computational framework for the methodology outlined in *Stochastic Modeling and Discrete Event Simulation of Urban Food Delivery Logistics Under Variable Precipitation: A Case Study of Baguio City*. All empirical data, bounding logic, and mode-shifting proxies are thoroughly defended in the manuscript's Data Requirements (Section 2.4) and Modeling Assumptions (Section 2.5).
