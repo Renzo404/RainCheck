@@ -1,0 +1,25 @@
+# --- Python Standard ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+
+# --- Simulation Outputs ---
+# This ensures you don't commit 100s of MBs of generated simulation logs
+data/outputs/*.csv
+data/outputs/*.json
+data/outputs/*.xlsx
+
+# --- IDE & OS Specific ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Distribution / Requirements ---
+dist/
+build/
+*.egg-info/

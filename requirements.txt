@@ -1,0 +1,14 @@
+# --- Core Simulation Engine ---
+simpy
+
+# --- Data Handling & Math ---
+pandas
+numpy
+scipy
+
+# --- Data Visualization ---
+matplotlib
+seaborn
+
+# --- Notebook Environment ---
+notebook
