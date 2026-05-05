@@ -40,7 +40,7 @@ The codebase is organized to strictly separate raw empirical data, core simulati
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/RainCheck.git
+   git clone https://github.com/Renzo404/RainCheck.git
    cd RainCheck
    ```
 
