@@ -201,6 +201,15 @@ data/outputs/
 
 ## Generated Outputs
 
+### `validation_report.txt`
+
+Automatically generated validation report checking whether:
+
+- no simulated time values are negative
+- total latency matches the sum of preparation, queueing, travel, and reposition time
+- SLA flags match the 45-minute threshold rule
+- raw order counts match replication and weather summaries
+
 ### `raincheck_raw_orders.csv`
 
 Contains **order-level simulation data**.

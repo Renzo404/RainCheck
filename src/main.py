@@ -10,16 +10,21 @@ from metrics import (
     print_and_save_arena_report,
     summarize_replication,
     summarize_weather,
+    validate_outputs,
 )
 from parameters import (
     BASELINE_ACTIVE_RIDERS,
     OUTPUT_DIR,
     RANDOM_SEED,
+    RAW_ORDERS_OUTPUT,
     REPLICATION_LENGTH_MINUTES,
+    REPLICATION_SUMMARY_OUTPUT,
     REPLICATIONS,
     REPOSITION_TIME_TRIANGULAR,
     SIMULATION_MONTH,
     TARGET_LATENCY_MINUTES,
+    WEATHER_LOG_OUTPUT,
+    WEATHER_SUMMARY_OUTPUT,
 )
 
 
@@ -58,11 +63,10 @@ class RainCheckSimulation:
         self.results = []
 
     def order_generator(self):
+        """Arena Create equivalent: generates customer order arrivals."""
         params = self.delivery_environment.current_parameters
 
-        mean_interarrival_minutes = (
-            60.0 / params["orders_per_hour"]
-        )
+        mean_interarrival_minutes = 60.0 / params["orders_per_hour"]
 
         while self.env.now < self.config.replication_length_minutes:
             interarrival = random.expovariate(
@@ -81,6 +85,11 @@ class RainCheckSimulation:
             )
 
     def order_process(self, order_id):
+        """
+        Arena Assign, Process, Record, Decide, and Dispose equivalent.
+
+        The order uses the replication's fixed weather-adjusted parameters.
+        """
         arrival_time = self.env.now
         params = self.delivery_environment.current_parameters
 
@@ -97,9 +106,7 @@ class RainCheckSimulation:
         with self.delivery_rider.request() as rider_request:
             yield rider_request
 
-            rider_queue_time = (
-                self.env.now - rider_queue_start
-            )
+            rider_queue_time = self.env.now - rider_queue_start
 
             distance_km = random.triangular(
                 params["distance_min"],
@@ -125,13 +132,10 @@ class RainCheckSimulation:
                 travel_time + reposition_time
             )
 
-        total_latency = (
-            self.env.now - arrival_time
-        )
+        total_latency = self.env.now - arrival_time
 
         met_sla = (
-            total_latency <=
-            self.config.target_latency_minutes
+            total_latency <= self.config.target_latency_minutes
         )
 
         self.results.append(
@@ -151,6 +155,7 @@ class RainCheckSimulation:
         )
 
     def run(self):
+        """Runs one replication and returns order results plus the weather log."""
         self.env.process(self.order_generator())
 
         self.env.run(
@@ -164,6 +169,7 @@ class RainCheckSimulation:
 
 
 def run_all_replications(config):
+    """Runs all replications and returns raw and summarized dataframes."""
     raw_order_rows = []
     weather_log_rows = []
     replication_summary_rows = []
@@ -206,6 +212,7 @@ def run_all_replications(config):
 
 
 def main():
+    """Main execution pipeline."""
     config = SimulationConfig(
         simulation_month=SIMULATION_MONTH,
         replication_length_minutes=REPLICATION_LENGTH_MINUTES,
@@ -226,35 +233,36 @@ def main():
         weather_summary_df
     ) = run_all_replications(config)
 
-    raw_orders_path = OUTPUT_DIR / "raincheck_raw_orders.csv"
-    weather_log_path = OUTPUT_DIR / "raincheck_replication_weather_log.csv"
-    replication_summary_path = OUTPUT_DIR / "raincheck_replication_summary.csv"
-    weather_summary_path = OUTPUT_DIR / "raincheck_weather_summary.csv"
-
-    raw_orders_df.to_csv(raw_orders_path, index=False)
-    weather_log_df.to_csv(weather_log_path, index=False)
-    replication_summary_df.to_csv(
-        replication_summary_path,
-        index=False
-    )
-    weather_summary_df.to_csv(
-        weather_summary_path,
-        index=False
-    )
+    raw_orders_df.to_csv(RAW_ORDERS_OUTPUT, index=False)
+    weather_log_df.to_csv(WEATHER_LOG_OUTPUT, index=False)
+    replication_summary_df.to_csv(REPLICATION_SUMMARY_OUTPUT, index=False)
+    weather_summary_df.to_csv(WEATHER_SUMMARY_OUTPUT, index=False)
 
     report_path = print_and_save_arena_report(
         config=config,
         replication_summary_df=replication_summary_df,
         weather_summary_df=weather_summary_df,
+        weather_log_df=weather_log_df,
         output_dir=OUTPUT_DIR
     )
 
+    validation_issues = validate_outputs(
+        raw_orders_df=raw_orders_df,
+        replication_summary_df=replication_summary_df,
+        weather_summary_df=weather_summary_df
+    )
+
     print("\nSaved output files:")
-    print("- " + str(raw_orders_path))
-    print("- " + str(weather_log_path))
-    print("- " + str(replication_summary_path))
-    print("- " + str(weather_summary_path))
+    print("- " + str(RAW_ORDERS_OUTPUT))
+    print("- " + str(WEATHER_LOG_OUTPUT))
+    print("- " + str(REPLICATION_SUMMARY_OUTPUT))
+    print("- " + str(WEATHER_SUMMARY_OUTPUT))
     print("- " + str(report_path))
+
+    if validation_issues:
+        print("\nValidation completed with issues.")
+    else:
+        print("\nValidation completed successfully.")
 
 
 if __name__ == "__main__":
