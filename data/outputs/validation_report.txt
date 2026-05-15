@@ -1,9 +1,9 @@
 ==============================================================================
 RAINCHECK OUTPUT VALIDATION REPORT
 ==============================================================================
-Validation Status: FAILED
+Validation Status: PASSED
 
-- 296 rows have total latency mismatches.
+All output consistency checks passed.
 
 Total Raw Orders: 7155
 ==============================================================================

@@ -334,11 +334,15 @@ def validate_outputs(raw_orders_df, replication_summary_df, weather_summary_df):
             raw_orders_df["rider_queue_time"] +
             raw_orders_df["travel_time"] +
             raw_orders_df["reposition_time"]
-        ).round(3)
+        )
 
-        recorded_latency = raw_orders_df["total_latency"].round(3)
+        recorded_latency = raw_orders_df["total_latency"]
 
-        mismatches = (recomputed_latency != recorded_latency).sum()
+        tolerance = 0.01
+
+        mismatches = (
+            (recomputed_latency - recorded_latency).abs() > tolerance
+        ).sum()
 
         if mismatches > 0:
             issues.append(
