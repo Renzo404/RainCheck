@@ -1,75 +1,357 @@
 # RainCheck
 
-SimPy discrete-event simulation analyzing food delivery SLA degradation during rain in Baguio City. Integrates Meteoblue climate data, FHWA speed penalties, and UP NCTS behavioral shifts to model the "perfect storm" of delivery bottlenecks where supply-side attrition meets a 44% demand surge. Built for urban logistics research.
+SimPy-based discrete-event simulation analyzing food delivery Service Level Agreement (SLA) performance under rainfall conditions in Baguio City. The model integrates **Meteoblue ERA5T historical climate data**, **DOST-PAGASA precipitation intensity standards**, **FHWA weather-related travel speed penalties**, and **behavioral demand shifts from UP NCTS research** to evaluate how adverse weather affects urban delivery logistics.
+
+Built as the computational framework for urban logistics and stochastic simulation research.
 
 ---
 
 ## Overview
 
-In highly congested, high-altitude urban environments like the Baguio City Central Business District (CBD), adverse weather severely degrades on-demand logistics. **RainCheck** quantifies this degradation by mapping real-world empirical data into a stochastic SimPy environment.
+In highly congested, high-altitude urban environments like the **Baguio City Central Business District (CBD)**, adverse weather conditions can significantly degrade on-demand food delivery performance. **RainCheck** quantifies this degradation using a **stochastic SimPy discrete-event simulation (DES)** framework.
 
-The simulation tests the breaking point of standard 45-minute Service Level Agreements (SLAs) by modeling the intersection of:
-* **Weather-Induced Demand Surges:** Consumers substitute physical dining trips with delivery, peaking at a 44.67% volume surge during intense rain (Sunga et al., 2017).
-* **Kinematic Travel Friction:** Vehicular speeds are dynamically reduced by up to 20% based on continuous road weather management guidelines (FHWA, 2023).
-* **Supply-Side Attrition:** The delivery fleet capacity diminishes during severe precipitation due to the hazards of Baguio's steep topography and poor visibility.
+The simulation evaluates whether standard **45-minute Service Level Agreements (SLAs)** remain attainable under adverse weather by modeling the interaction between:
+
+### Weather-Induced Demand Surges
+Consumers substitute physical dining trips with food delivery during rainfall, increasing delivery demand. Based on **UP National Center for Transportation Studies (NCTS)** findings (Sunga et al., 2017), food delivery demand increases by as much as **44.67% during heavy rainfall conditions**.
+
+### Kinematic Travel Friction
+Delivery rider travel speed decreases under adverse road weather conditions. Following **FHWA road weather management guidance**, rider speed is reduced by up to **20% during heavy precipitation**, increasing travel times and delivery latency.
+
+### Stochastic Weather Conditions
+Monthly precipitation probabilities are derived from **Meteoblue ERA5T historical climate data** and mapped to **DOST-PAGASA precipitation intensity standards**. These probabilities govern stochastic weather-state selection during simulation execution.
+
+Each simulation replication models a **4-hour peak delivery period (16:00–20:00)** in which **one weather condition remains fixed throughout the replication**, following the assumptions defined in the manuscript methodology.
+
+---
+
+## Simulation Design
+
+The RainCheck simulation follows a **Discrete-Event Simulation (DES)** architecture modeled after Arena simulation logic.
+
+### Simulation Flow
+
+```text
+Create  →  Assign  →  Process  →  Record  →  Decide  →  Dispose
+```
+
+| Arena Logic | RainCheck Implementation |
+|---|---|
+| **Create** | Stochastic customer order arrivals using exponential interarrival times |
+| **Assign** | Weather state selection and order timestamp assignment |
+| **Process** | Restaurant preparation and rider delivery processing |
+| **Record** | Delivery latency measurement |
+| **Decide** | SLA compliance evaluation |
+| **Dispose** | Completed order logging |
+
+### Key Modeling Assumptions
+
+The simulation preserves the assumptions defined in the research manuscript:
+
+- **Baseline rider speed:** `16 km/h`
+- **Delivery SLA threshold:** `45 minutes`
+- **Peak delivery simulation period:** `240 minutes (16:00–20:00)`
+- **Number of replications:** `30`
+- **Baseline active riders:** `30`
+- **Baseline order rate:** `50 orders/hour`
+- **Weather condition:** Fixed throughout each replication
+- **Random seed:** Fixed for reproducibility
+
+### Weather Effects
+
+| Weather State | Demand Multiplier | Speed Penalty | Effective Rider Speed |
+|---|---:|---:|---:|
+| Dry | 1.0000 | 0% | 16.0 km/h |
+| Light Rains | 1.1767 | 10% | 14.4 km/h |
+| Moderate Rains | 1.3933 | 15% | 13.6 km/h |
+| Heavy Rains | 1.4467 | 20% | 12.8 km/h |
 
 ---
 
 ## Repository Structure
 
-The codebase is organized to strictly separate raw empirical data, core simulation logic, and resulting analysis.
+The repository is organized to separate empirical data, simulation logic, and outputs.
 
-* **`data/`**
-  * `raw/`: Unedited empirical data, including historical Meteoblue ERA5T climate data (mm/day).
-  * `outputs/`: Generated simulation logs (CSVs). *Note: These are ignored by Git to prevent repository bloat.*
-* **`notebooks/`**
-  * Jupyter Notebooks used for post-simulation data visualization and generating figures for the final manuscript.
-* **`src/`**
-  * `__init__.py`: Package initialization.
-  * `entities.py`: Class definitions for system actors (Orders, Riders, Restaurants).
-  * `environment.py`: The SimPy environment setup, orchestrating weather triggers and queues.
-  * `main.py`: The primary execution script to run the simulation.
-  * `metrics.py`: Calculation tools for SLA latency tracking and threshold validation.
-  * `parameters.py`: **The Control Center.** Contains all Modeling Assumptions (baseline speed, arrival rates, and empirical multipliers).
-* **`.gitignore`**: Standard Python ignores plus safeguards for `data/outputs/`.
-* **`requirements.txt`**: Required Python dependencies.
+```text
+RainCheck/
+│
+├── data/
+│   ├── raw/
+│   │   └── meteoblue_pagasa_probabilities.csv
+│   │
+│   └── outputs/
+│       ├── raincheck_raw_orders.csv
+│       ├── raincheck_replication_weather_log.csv
+│       ├── raincheck_replication_summary.csv
+│       ├── raincheck_weather_summary.csv
+│       └── arena_style_report.txt
+│
+├── notebooks/
+│   └── visualization notebooks
+│
+├── src/
+│   ├── __init__.py
+│   ├── entities.py
+│   ├── environment.py
+│   ├── main.py
+│   ├── metrics.py
+│   └── parameters.py
+│
+├── requirements.txt
+├── .gitignore
+└── README.md
+```
+
+### Source Code Description
+
+#### `entities.py`
+Contains dataclasses used by the simulation:
+
+- `SimulationConfig`
+- `OrderResult`
+
+#### `environment.py`
+Handles:
+
+- loading weather probability data
+- monthly weather selection
+- stochastic weather-state sampling
+- weather-adjusted parameter generation
+
+#### `main.py`
+Contains the **core SimPy discrete-event simulation engine**, including:
+
+- customer order arrivals
+- restaurant preparation
+- rider queueing
+- travel time simulation
+- SLA evaluation
+- replication execution
+
+#### `metrics.py`
+Generates:
+
+- replication summaries
+- weather summaries
+- latency calculations
+- SLA statistics
+- Arena-style simulation reports
+
+#### `parameters.py`
+Acts as the **control center** for all simulation assumptions and empirical model parameters.
 
 ---
 
 ## Installation & Setup
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Renzo404/RainCheck.git
-   cd RainCheck
-   ```
+### 1. Clone the Repository
 
-2. **Create a virtual environment (Recommended):**
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
-   ```
+```bash
+git clone https://github.com/Renzo404/RainCheck.git
+cd RainCheck
+```
 
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+### 2. Create a Virtual Environment (Recommended)
+
+macOS/Linux:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+Windows:
+
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
 
 ---
 
 ## Usage
 
-**Running the Simulation**
-Execute the main script to start a simulation run. By default, it will read the configurations set in `parameters.py` and output the timeline logs to the `data/outputs/` directory.
+### Running the Simulation
+
+Execute the main simulation script:
 
 ```bash
 python src/main.py
 ```
 
-**Modifying Parameters**
-To adjust the simulation (e.g., testing different rider fleet capacities or altering the FHWA speed penalty brackets), edit the variables directly inside `src/parameters.py`. The logic architecture is built so that parameter adjustments do not require rewriting the core SimPy environment.
+The simulation reads configuration values from:
+
+```text
+src/parameters.py
+```
+
+and automatically saves all outputs to:
+
+```text
+data/outputs/
+```
+
+---
+
+## Generated Outputs
+
+### `raincheck_raw_orders.csv`
+
+Contains **order-level simulation data**.
+
+Includes:
+
+- order arrival time
+- preparation duration
+- rider queue time
+- travel time
+- reposition time
+- total latency
+- SLA compliance
+
+---
+
+### `raincheck_replication_weather_log.csv`
+
+Contains **one sampled weather condition per replication**.
+
+Example:
+
+```csv
+replication,weather_state,monthly_probability
+1,Heavy Rains,0.5162
+2,Light Rains,0.3226
+```
+
+---
+
+### `raincheck_replication_summary.csv`
+
+Contains **replication-level KPIs**:
+
+- average latency
+- 95th percentile latency
+- maximum latency
+- SLA violation rate
+- rider queue times
+- degradation status
+
+---
+
+### `raincheck_weather_summary.csv`
+
+Aggregated system performance grouped by weather condition.
+
+Useful for:
+
+- comparing weather impacts
+- statistical interpretation
+- manuscript tables
+
+---
+
+### `arena_style_report.txt`
+
+Human-readable simulation report inspired by **Arena output reports**.
+
+Includes:
+
+- weather summaries
+- latency statistics
+- replication performance
+- SLA outcomes
+
+---
+
+## Modifying Parameters
+
+To test different experimental scenarios, edit:
+
+```text
+src/parameters.py
+```
+
+Examples:
+
+### Change Simulation Month
+
+```python
+SIMULATION_MONTH = "Jul"
+```
+
+### Change Rider Capacity
+
+```python
+BASELINE_ACTIVE_RIDERS = 40
+```
+
+### Change Replication Count
+
+```python
+REPLICATIONS = 50
+```
+
+The architecture is intentionally modular so parameter changes **do not require rewriting the simulation engine**.
+
+---
+
+## Reproducibility
+
+RainCheck uses a **fixed random seed** to ensure simulation reproducibility.
+
+This guarantees:
+
+- identical results across repeated runs
+- reproducible manuscript tables
+- experimental consistency
+- easier debugging and validation
+
+The random seed can be changed inside:
+
+```python
+RANDOM_SEED = 10000
+```
+
+in:
+
+```text
+src/parameters.py
+```
 
 ---
 
 ## Academic Context
-This repository serves as the computational framework for the methodology outlined in *Stochastic Modeling and Discrete Event Simulation of Urban Food Delivery Logistics Under Variable Precipitation: A Case Study of Baguio City*. All empirical data, bounding logic, and mode-shifting proxies are thoroughly defended in the manuscript's Data Requirements (Section 2.4) and Modeling Assumptions (Section 2.5).
+
+This repository serves as the computational framework for the methodology presented in:
+
+> **“Stochastic Modeling and Discrete Event Simulation of Urban Food Delivery Logistics Under Variable Precipitation: A Case Study of Baguio City”**
+
+The simulation framework operationalizes empirical assumptions described in:
+
+- **Section 2.4 — Data Requirements**
+- **Section 2.5 — Modeling Assumptions**
+- **Appendix A — Meteoblue Historical Climate Data**
+- **Appendix B — Weather State Probability Mapping**
+
+Weather conditions are sampled probabilistically using monthly historical precipitation distributions, while remaining **fixed within each 4-hour replication**, consistent with the study's simulation assumptions.
+
+---
+
+## References
+
+- **Federal Highway Administration (FHWA).** (2023). Road Weather Management Program.
+- **Meteoblue ERA5T Historical Climate Model.**
+- **DOST-PAGASA Rainfall Intensity Classification Standards.**
+- **Sunga et al. (2017).** UP National Center for Transportation Studies (NCTS) behavioral mobility findings.
+
+---
+
+## License
+
+This repository is intended for **academic and research purposes**.

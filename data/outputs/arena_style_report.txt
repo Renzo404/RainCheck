@@ -1,0 +1,79 @@
+==============================================================================
+ARENA-STYLE SIMULATION OUTPUT REPORT
+==============================================================================
+
+MODEL NAME: RainCheck Baguio Food Delivery Logistics DES
+SIMULATION MONTH: Aug
+REPLICATION LENGTH: 240.0 minutes
+NUMBER OF REPLICATIONS: 30
+BASE TIME UNITS: Minutes
+SLA THRESHOLD: 45.0 minutes
+WEATHER ASSUMPTION: One sampled weather state is fixed per replication.
+
+------------------------------------------------------------------------------
+WEATHER SUMMARY
+------------------------------------------------------------------------------
+
+Weather Condition: Light Rains
+  Completed Orders          : 1867
+  Mean Total Latency        : 28.64 minutes
+  95th Percentile Latency   : 35.23 minutes
+  Maximum Latency           : 40.94 minutes
+  Mean Rider Queue Time     : 0.00 minutes
+  SLA Violation Rate        : 0.00%
+
+Weather Condition: Moderate Rains
+  Completed Orders          : 1968
+  Mean Total Latency        : 29.21 minutes
+  95th Percentile Latency   : 35.89 minutes
+  Maximum Latency           : 43.05 minutes
+  Mean Rider Queue Time     : 0.01 minutes
+  SLA Violation Rate        : 0.00%
+
+Weather Condition: Heavy Rains
+  Completed Orders          : 3320
+  Mean Total Latency        : 29.88 minutes
+  95th Percentile Latency   : 36.95 minutes
+  Maximum Latency           : 42.96 minutes
+  Mean Rider Queue Time     : 0.04 minutes
+  SLA Violation Rate        : 0.00%
+
+------------------------------------------------------------------------------
+REPLICATION SUMMARY
+------------------------------------------------------------------------------
+Replication | Weather        | Completed | Avg Latency | P95 Latency | SLA Viol. | Degraded
+------------------------------------------------------------------------------
+          1 | Moderate Rains |       245 |       29.53 |       36.36 |     0.00% |    False
+          2 | Moderate Rains |       229 |       29.38 |       35.44 |     0.00% |    False
+          3 | Heavy Rains    |       271 |       30.17 |       37.47 |     0.00% |    False
+          4 | Heavy Rains    |       236 |       29.84 |       37.17 |     0.00% |    False
+          5 | Heavy Rains    |       244 |       30.00 |       36.80 |     0.00% |    False
+          6 | Light Rains    |       171 |       28.88 |       35.56 |     0.00% |    False
+          7 | Light Rains    |       216 |       28.48 |       33.83 |     0.00% |    False
+          8 | Light Rains    |       207 |       28.36 |       34.70 |     0.00% |    False
+          9 | Light Rains    |       205 |       28.81 |       35.13 |     0.00% |    False
+         10 | Heavy Rains    |       277 |       29.69 |       36.36 |     0.00% |    False
+         11 | Light Rains    |       219 |       28.50 |       34.54 |     0.00% |    False
+         12 | Moderate Rains |       261 |       28.94 |       35.65 |     0.00% |    False
+         13 | Moderate Rains |       249 |       29.00 |       36.05 |     0.00% |    False
+         14 | Moderate Rains |       251 |       29.34 |       35.77 |     0.00% |    False
+         15 | Light Rains    |       210 |       28.24 |       34.42 |     0.00% |    False
+         16 | Moderate Rains |       260 |       29.18 |       36.63 |     0.00% |    False
+         17 | Heavy Rains    |       253 |       29.74 |       36.45 |     0.00% |    False
+         18 | Heavy Rains    |       276 |       30.12 |       37.13 |     0.00% |    False
+         19 | Heavy Rains    |       253 |       30.29 |       37.44 |     0.00% |    False
+         20 | Heavy Rains    |       271 |       30.02 |       36.41 |     0.00% |    False
+         21 | Heavy Rains    |       243 |       29.37 |       36.67 |     0.00% |    False
+         22 | Heavy Rains    |       231 |       29.27 |       36.51 |     0.00% |    False
+         23 | Heavy Rains    |       258 |       30.28 |       37.28 |     0.00% |    False
+         24 | Light Rains    |       232 |       29.03 |       36.07 |     0.00% |    False
+         25 | Moderate Rains |       236 |       29.21 |       36.06 |     0.00% |    False
+         26 | Heavy Rains    |       247 |       29.78 |       36.83 |     0.00% |    False
+         27 | Light Rains    |       182 |       28.55 |       36.22 |     0.00% |    False
+         28 | Moderate Rains |       237 |       29.15 |       35.61 |     0.00% |    False
+         29 | Light Rains    |       225 |       28.86 |       34.94 |     0.00% |    False
+         30 | Heavy Rains    |       260 |       29.75 |       37.18 |     0.00% |    False
+
+==============================================================================
+END OF ARENA-STYLE REPORT
+==============================================================================
